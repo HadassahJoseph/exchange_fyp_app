@@ -9,14 +9,14 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.replace('HomeScreen', { userId: user.uid });
-      }
-    });
-    return unsubscribe;
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       navigation.replace('AppTabs');
+  //     }
+  //   });
+  //   return unsubscribe;
+  // }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -28,7 +28,8 @@ export default function LoginScreen({ navigation }) {
     //   await signInWithEmailAndPassword(auth, email, password);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
-      navigation.replace('HomeScreen', { userId });
+      navigation.replace('AppNavigator');
+
     } catch (error) {
       Alert.alert("Login failed", error.message);
     }

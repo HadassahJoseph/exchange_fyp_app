@@ -15,7 +15,7 @@ const SignUpScreen = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                navigation.replace('CompleteProfileScreen', { userId: user.uid });
+                navigation.replace('CompleteProfileStep1', { userId: user.uid });
               }              
         });
         return unsubscribe;

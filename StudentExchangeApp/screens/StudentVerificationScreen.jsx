@@ -39,7 +39,7 @@ export default function StudentVerificationScreen({ route, navigation }) {
             });
 
             Alert.alert("Success", `Account ${isUniversityEmail ? "verified" : "pending review"}`);
-            navigation.navigate('CompleteProfileScreenprofile');
+            navigation.navigate('CompleteProfileStep1');
         } catch (error) {
             Alert.alert("Error", "Failed to save verification status.");
         } finally {
