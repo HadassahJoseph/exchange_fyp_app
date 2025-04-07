@@ -1,22 +1,12 @@
-// screens/LoginScreen.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
-import styles from '../styles/loginStyles';
+import styles from '../styles/authStyles'; // Using the same sleek style
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       navigation.replace('AppTabs');
-  //     }
-  //   });
-  //   return unsubscribe;
-  // }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,11 +15,9 @@ export default function LoginScreen({ navigation }) {
     }
 
     try {
-    //   await signInWithEmailAndPassword(auth, email, password);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
       navigation.replace('AppNavigator');
-
     } catch (error) {
       Alert.alert("Login failed", error.message);
     }
@@ -37,19 +25,22 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Welcome Back</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#ccc"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
 
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#ccc"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -57,6 +48,10 @@ export default function LoginScreen({ navigation }) {
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Log In</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+        <Text style={[styles.linkText, { marginTop: 8, fontSize: 14 }]}>Forgot Password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>

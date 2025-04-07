@@ -1,6 +1,5 @@
-// screens/CompleteProfileStep2.jsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import styles from '../styles/completeProfileStyles';
 import countries from 'world-countries';
@@ -9,7 +8,6 @@ DropDownPicker.setMode('SCROLLVIEW');
 
 export default function CompleteProfileStep2({ navigation, route }) {
   const { studyChoice, preferredLanguage, userId } = route.params;
-
 
   const [hostCountry, setHostCountry] = useState('');
   const [homeCountry, setHomeCountry] = useState('');
@@ -33,19 +31,19 @@ export default function CompleteProfileStep2({ navigation, route }) {
     }
 
     navigation.navigate('CompleteProfileStep3', {
-      userId,   
+      userId,
       studyChoice,
       preferredLanguage,
       hostCountry,
-      homeCountry
+      homeCountry,
     });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Step 2: Country Info</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Text style={styles.header}>Step 2: Country Info</Text>
 
-      <View style={{ zIndex: 1000 }}>
         <Text style={styles.label}>Host Country</Text>
         <DropDownPicker
           open={hostOpen}
@@ -56,10 +54,13 @@ export default function CompleteProfileStep2({ navigation, route }) {
           setItems={setCountryItems}
           placeholder="Select Host Country"
           searchable={true}
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={styles.dropdownTextStyle}
+          placeholderStyle={styles.dropdownPlaceholderStyle}
+          selectedItemLabelStyle={styles.selectedItemLabelStyle}
         />
-      </View>
 
-      <View style={{ zIndex: 500, marginTop: 20 }}>
         <Text style={styles.label}>Home Country</Text>
         <DropDownPicker
           open={homeOpen}
@@ -70,12 +71,17 @@ export default function CompleteProfileStep2({ navigation, route }) {
           setItems={setCountryItems}
           placeholder="Select Home Country"
           searchable={true}
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={styles.dropdownTextStyle}
+          placeholderStyle={styles.dropdownPlaceholderStyle}
+          selectedItemLabelStyle={styles.selectedItemLabelStyle}
         />
-      </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleNext}>
-        <Text style={styles.submitText}>Next</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.submitButton} onPress={handleNext}>
+          <Text style={styles.submitText}>Next</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

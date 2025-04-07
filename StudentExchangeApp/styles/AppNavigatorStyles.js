@@ -1,42 +1,59 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  fabWrapper: {
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 30,
-    left: '50%',
-    transform: [{ translateX: -30 }],
+  tabBar: {
+    backgroundColor: '#1e1e1e',
+    borderTopColor: '#333',
+    height: 70,
+    paddingBottom: 10,
   },
-  fabMain: {
-    backgroundColor: '#4CAF50',
+  ffabContainer: {
+    top: -30, // slight elevation to blend with tab bar
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+  fabButton: {
     width: 60,
     height: 60,
     borderRadius: 30,
+    backgroundColor: '#A8E9DC',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 6,
-    zIndex: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  fabMenu: {
+  
+  fabMenuWrapper: {
     position: 'absolute',
-    bottom: 80,
+    alignItems: 'center',
+    bottom: 30,
+    left: 0,
+    right: 0,
+  },
+  
+  fabMenuOptions: {
+    position: 'absolute',
+    bottom: 70,
     alignItems: 'center',
   },
+  
   fabOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#00796B',
-    paddingHorizontal: 12,
+    backgroundColor: '#A8E9DC',
     paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 20,
-    marginVertical: 6,
-    elevation: 3,
+    marginBottom: 10,
   },
+  
   fabOptionText: {
     color: '#fff',
     marginLeft: 8,
-    fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });

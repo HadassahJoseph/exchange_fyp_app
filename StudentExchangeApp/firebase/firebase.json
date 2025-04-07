@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18",
+    "gen": 1,
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "*.local"
+    ],
+    "predeploy": [
+      "npm --prefix functions run lint"
+    ]
+  }
+}
