@@ -26,6 +26,9 @@ import ChatRoom from './screens/ChatRoom';
 import OnboardingScreen from './screens/OnboardingScreen';
 import SplashScreen from './screens/SplashScreenView';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
+import EditProfileStep1 from './screens/EditProfileStep1';
+import EditProfileStep2 from './screens/EditProfileStep2';
 
 
 const Stack = createNativeStackNavigator();
@@ -107,6 +110,9 @@ export default function App() {
         <Stack.Screen name="AddPlaceScreen" component={AddPlaceScreen} />
         <Stack.Screen name="FavouritesScreen" component={FavouritesScreen} />
         <Stack.Screen name="ChatRoom" component={ChatRoom} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="EditProfileStep1" component={EditProfileStep1} />
+        <Stack.Screen name="EditProfileStep2" component={EditProfileStep2} />
       </Stack.Navigator>
     </NavigationContainer>
   );

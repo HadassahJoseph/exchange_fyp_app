@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, FlatList } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase/firebaseConfig';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, getDocs } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, getDocs, collection } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/ProfileHomeStyles';
 
 export default function ProfileHomeScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = useState('');
+  const [profilePic, setProfilePic] = useState(null);
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function ProfileHomeScreen() {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUsername(userData.username || 'Unknown');
+          setProfilePic(userData.profilePic || null);
 
           // Load pending requests
           const pending = userData.connectionRequests || [];
@@ -60,13 +62,17 @@ export default function ProfileHomeScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/100' }}
+          source={profilePic ? { uri: profilePic } : require('../assets/user.png')}
           style={styles.avatar}
         />
         <Text style={styles.username}>@{username}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('CompleteProfileStep1', { userId: auth.currentUser?.uid })}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('CompleteProfileStep1', { userId: auth.currentUser?.uid })}>
           <Text style={styles.link}>View my profile</Text>
+        </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => navigation.navigate('EditProfileStep1')}>
+          <Text style={styles.link}>View My Profile</Text>
         </TouchableOpacity>
+
       </View>
 
       <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('FavouritesScreen')}>
@@ -98,7 +104,7 @@ export default function ProfileHomeScreen() {
             renderItem={({ item }) => (
               <View style={styles.requestCard}>
                 <Image
-                  source={{ uri: item.avatarUrl || 'https://via.placeholder.com/100' }}
+                  source={{ uri: item.profilePic || 'https://via.placeholder.com/100' }}
                   style={styles.avatar}
                 />
                 <View style={{ flex: 1 }}>
@@ -115,6 +121,3 @@ export default function ProfileHomeScreen() {
     </ScrollView>
   );
 }
-
-
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Image, ScrollView, Platform, KeyboardAvoidingView, Linking } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -141,7 +141,7 @@ export default function CompleteProfileStep1({ navigation, route }) {
         <TextInput
           style={styles.input}
           placeholder="Short bio about yourself"
-          placeholderTextColor="#aaa"
+          placeholderTextColor="#ccc"
           multiline
           numberOfLines={3}
           value={bio}
@@ -162,7 +162,7 @@ export default function CompleteProfileStep1({ navigation, route }) {
           dropDownContainerStyle={styles.dropdownContainer}
           textStyle={styles.dropdownTextStyle}
           placeholderStyle={styles.dropdownPlaceholderStyle}
-          labelStyle={styles.selectedLabel}
+          labelStyle={{ color: '#ffffff' }}
         />
         {studyChoice === 'Other' && (
           <TextInput
@@ -193,7 +193,7 @@ export default function CompleteProfileStep1({ navigation, route }) {
           dropDownContainerStyle={styles.dropdownContainer}
           textStyle={styles.dropdownTextStyle}
           placeholderStyle={styles.dropdownPlaceholderStyle}
-          labelStyle={styles.selectedLabel}
+          labelStyle={{ color: '#ffffff' }}
         />
         {preferredLanguage === 'Other' && (
           <TextInput
@@ -218,7 +218,7 @@ export default function CompleteProfileStep1({ navigation, route }) {
           dropDownContainerStyle={styles.dropdownContainer}
           textStyle={styles.dropdownTextStyle}
           placeholderStyle={styles.dropdownPlaceholderStyle}
-          labelStyle={styles.selectedLabel}
+          labelStyle={{ color: '#ffffff' }}
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleNext}>

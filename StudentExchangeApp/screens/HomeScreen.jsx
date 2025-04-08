@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {
+import { 
   View, Text, TouchableOpacity, FlatList, Image,
-  SafeAreaView, Dimensions, TextInput
+  SafeAreaView, Dimensions, TextInput, Platform, StatusBar 
 } from 'react-native';
+
 import { collection, onSnapshot, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebaseConfig';
@@ -256,23 +257,28 @@ export default function HomeScreen() {
 
   const renderTab = (label) => (
     <TouchableOpacity
-      style={[styles.tab, selectedTab === label && styles.activeTab]}
+      style={styles.tab}
       onPress={() => setSelectedTab(label)}>
-      <Text style={[styles.tabText, selectedTab === label && styles.activeTabText]}>{label}</Text>
+      <Text style={[styles.tabText, selectedTab === label && styles.activeTabText]}>
+        {label}
+      </Text>
+      {selectedTab === label && <View style={styles.activeTabUnderline} />}
     </TouchableOpacity>
   );
+  
 
   if (!userId) return <Text style={{ padding: 20 }}>Loading user...</Text>;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ paddingTop: 20, paddingBottom: 10, backgroundColor: '#fff' }}>
-        <View style={styles.tabContainer}>
-          {renderTab('Posts')}
-          {renderTab('Discussions')}
-          {renderTab('Items')}
-        </View>
+    <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
+     <View style={{ backgroundColor: '#1e1e1e' }}>
+      <View style={styles.tabContainer}>
+        {renderTab('Posts')}
+        {renderTab('Discussions')}
+        {renderTab('Items')}
       </View>
+    </View>
+
 
       {selectedTab === 'Posts' && (
         <FlatList

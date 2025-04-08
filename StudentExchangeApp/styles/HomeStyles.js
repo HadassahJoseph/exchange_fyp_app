@@ -2,28 +2,41 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
     container: { flex: 1, backgroundColor: '#fff' },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    backgroundColor: '#f5f5f5',
-  },
-  tab: {
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#e0e0e0',
-  },
-  activeTab: {
-    backgroundColor: '#00796B',
-  },
-  tabText: {
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  activeTabText: {
-    color: 'white',
-  },
+    tabContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      backgroundColor: '#1e1e1e',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderBottomWidth: 1,
+      borderColor: '#333',
+    },
+    
+    tab: {
+      flex: 1,
+      alignItems: 'center',
+      paddingBottom: 10,
+    },
+    
+    activeTabUnderline: {
+      height: 3,
+      backgroundColor: '#A8E9DC',
+      width: '60%',
+      borderRadius: 2,
+      marginTop: 4,
+    },
+    
+    tabText: {
+      color: '#aaa',
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    
+    activeTabText: {
+      color: '#ffffff',
+      fontWeight: '700',
+    },
+    
   list: {
     padding: 12,
   },
