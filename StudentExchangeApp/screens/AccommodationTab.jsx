@@ -15,17 +15,23 @@ export default function AccommodationTab() {
   const fetchHouses = async () => {
     if (!country || !city) return;
     setLoading(true);
-    const url = `http://10.156.38.133:5000/scrape?country=${country}&city=${city}${university ? `&university=${university}` : ''}`;
-
+  
+    const url = `https://accommodation-scraper-blue-sky-2563.fly.dev/scrape?country=${country}&city=${city}${university ? `&university=${university}` : ''}`;
+  
     try {
       const response = await fetch(url);
-      const data = await response.json();
+      const text = await response.text();  // 👈 read as plain text first
+      console.log('🔍 Raw response:', text);
+  
+      const data = JSON.parse(text);       // 👈 try parsing it after logging
       setHouses(data.houses || []);
     } catch (err) {
-      console.error('Error fetching houses:', err);
+      console.error('❌ Error fetching houses:', err);
     }
+  
     setLoading(false);
   };
+  
 
   return (
     <View style={styles.container}>
