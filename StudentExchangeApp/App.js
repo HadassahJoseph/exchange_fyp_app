@@ -29,6 +29,13 @@ import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import EditProfileStep1 from './screens/EditProfileStep1';
 import EditProfileStep2 from './screens/EditProfileStep2';
+import PostDetailScreen from './screens/PostDetailScreen';
+import PostCard from './screens/PostCard';
+import ItemCard from './screens/ItemCard';
+import DiscussionCard from './screens/DiscussionCard';
+import MapTab from './screens/MapTab';
+import ConnectionsTab from  './screens/ConnectionsTab';
+import AccommodationTab from './screens/AccommodationTab';
 
 
 const Stack = createNativeStackNavigator();
@@ -113,6 +120,13 @@ export default function App() {
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="EditProfileStep1" component={EditProfileStep1} />
         <Stack.Screen name="EditProfileStep2" component={EditProfileStep2} />
+        <Stack.Screen name="PostDetailScreen" component={PostDetailScreen}/>
+        <Stack.Screen name="PostCard" component={PostCard}/>
+        <Stack.Screen name="ItemCard" component={ItemCard}/>
+        <Stack.Screen name="DiscussionCard" component={DiscussionCard}/>
+        <Stack.Screen name="MapTab" component={MapTab}/>
+        <Stack.Screen name="ConnectionsTab" component= {ConnectionsTab}/>
+        <Stack.Screen name="AccommodationTab" component={AccommodationTab}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
