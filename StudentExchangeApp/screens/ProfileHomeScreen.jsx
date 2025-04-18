@@ -26,7 +26,9 @@ export default function ProfileHomeScreen() {
           // Load pending requests
           const pending = userData.connectionRequests || [];
           const snapshot = await getDocs(collection(db, 'users'));
-          const requestUsers = snapshot.docs.filter(doc => pending.includes(doc.id)).map(doc => ({ id: doc.id, ...doc.data() }));
+          const requestUsers = snapshot.docs
+            .filter(doc => pending.includes(doc.id))
+            .map(doc => ({ id: doc.id, ...doc.data() }));
           setRequests(requestUsers);
         }
       }
@@ -66,58 +68,33 @@ export default function ProfileHomeScreen() {
           style={styles.avatar}
         />
         <Text style={styles.username}>@{username}</Text>
-        {/* <TouchableOpacity onPress={() => navigation.navigate('CompleteProfileStep1', { userId: auth.currentUser?.uid })}>
-          <Text style={styles.link}>View my profile</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity onPress={() => navigation.navigate('EditProfileStep1')}>
-          <Text style={styles.link}>View My Profile</Text>
-        </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => navigation.navigate('EditProfileStep1')}>
+          <Text style={styles.link}>Edit Profile</Text>
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('FavouritesScreen')}>
-        <Text style={styles.sectionText}>❤️ Favourite Items</Text>
+        <Text style={styles.sectionText}>Favourite Items</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('HistoryScreen')}>
-        <Text style={styles.sectionText}>🕓 History</Text>
+      <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('ProfileViewScreen')}>
+        <Text style={styles.sectionText}>View Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('PostsScreen')}>
-        <Text style={styles.sectionText}>✍️ My Posts</Text>
+      <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('EditContentScreen')}>
+        <Text style={styles.sectionText}>Edit Posts / Discussions / Favourites</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('SettingsScreen')}>
-        <Text style={styles.sectionText}>⚙️ Settings</Text>
+        <Text style={styles.sectionText}>Settings</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.section} onPress={handleLogout}>
-        <Text style={[styles.sectionText, { color: 'red' }]}>🚪 Log Out</Text>
+        <Text style={[styles.sectionText, { color: 'red' }]}>Log Out</Text>
       </TouchableOpacity>
 
-      {requests.length > 0 && (
-        <View style={{ marginTop: 20 }}>
-          <Text style={styles.sectionText}>🤝 Pending Requests</Text>
-          <FlatList
-            data={requests}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.requestCard}>
-                <Image
-                  source={{ uri: item.profilePic || 'https://via.placeholder.com/100' }}
-                  style={styles.avatar}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
-                  <TouchableOpacity onPress={() => acceptConnection(item.id)} style={styles.acceptBtn}>
-                    <Text style={{ color: 'white' }}>Accept</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          />
-        </View>
-      )}
+    
     </ScrollView>
   );
 }

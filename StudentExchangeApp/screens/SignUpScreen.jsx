@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Alert, TextInput, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { auth, db, functions } from '../firebase/firebaseConfig';
@@ -11,8 +12,22 @@ const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const universityDomains = ['mytudublin.ie', 'ucd.ie', 'ul.ie', 'mu.ie', 'gmail.com'];
+  const universityDomains = [
+    'mytudublin.ie',
+    'ucd.ie',
+    'ul.ie',
+    'mu.ie',
+    'tcd.ie',
+    'dcu.ie',
+    'nuigalway.ie',
+    'studentmail.ul.ie',
+    'student.tcd.ie',
+    'gmail.com', // for testing, can be removed later
+    'edu',
+    'ac.uk'
+  ];
 
   const handleSignUp = async () => {
     if (!email || !password || !username) {
@@ -20,11 +35,25 @@ const SignUpScreen = ({ navigation }) => {
       return;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&/#^+=~]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      Alert.alert(
+        'Weak Password',
+        'Password must be at least 8 characters long and include:\n- an uppercase letter\n- a lowercase letter\n- a number\n- a special character.'
+      );
+      return;
+    }
+
     const emailDomain = email.split('@')[1];
-    const isUniversityEmail = universityDomains.includes(emailDomain);
+    const isUniversityEmail = universityDomains.some((domain) =>
+      emailDomain.endsWith(domain)
+    );
 
     if (!isUniversityEmail) {
-      Alert.alert('Invalid Email', 'Please use a valid university email.');
+      Alert.alert(
+        'Invalid Email',
+        'Please use your official university email (e.g., ending in .edu or .ac.uk).'
+      );
       return;
     }
 
@@ -98,6 +127,7 @@ const SignUpScreen = ({ navigation }) => {
         value={username}
         onChangeText={setUsername}
       />
+
       <TextInput
         style={styles.input}
         placeholder="University Email"
@@ -107,14 +137,32 @@ const SignUpScreen = ({ navigation }) => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
+    <View style={{ position: 'relative', width: '100%', marginBottom: 10 }}>
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#ccc"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={!showPassword}
       />
+      <TouchableOpacity
+        style={{ position: 'absolute', right: 15, top: '30%' }}
+        onPress={() => setShowPassword(!showPassword)}
+      >
+        <Ionicons
+          name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+          size={22}
+          color="#A8E9DC"
+        />
+      </TouchableOpacity>
+    </View>
+
+
+      <Text style={{ fontSize: 12, color: '#aaa', marginTop: -10, marginBottom: 10 }}>
+        Password must be at least 8 characters and include uppercase, lowercase, number, and special character.
+      </Text>
 
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>

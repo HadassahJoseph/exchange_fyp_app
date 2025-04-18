@@ -1,50 +1,104 @@
-// ItemDetailScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  Alert
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import styles from '../styles/ItemDetailStyles';
 
 export default function ItemDetailScreen({ route, navigation }) {
   const { item } = route.params;
-  const [sellerName, setSellerName] = useState('');
   const [likes, setLikes] = useState(item.likes || []);
+  const [sellerName, setSellerName] = useState('');
+  const [sellerInfo, setSellerInfo] = useState(null);
   const userId = getAuth().currentUser?.uid;
+  const screenWidth = Dimensions.get('window').width;
+
+  const sellerId = item.userId || item.sellerId || item.createdBy || null;
 
   useEffect(() => {
     const fetchSellerInfo = async () => {
-      if (item.userId) {
-        try {
-          const docRef = doc(db, 'users', item.userId);
-          const userDoc = await getDoc(docRef);
-          if (userDoc.exists()) {
-            setSellerName(userDoc.data().username || 'Unknown');
-          }
-        } catch (error) {
-          console.error('Failed to fetch seller name:', error);
+      if (!sellerId) {
+        console.warn(" No seller ID found on this item");
+        return;
+      }
+
+      try {
+        const docRef = doc(db, 'users', sellerId);
+        const userDoc = await getDoc(docRef);
+
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const info = {
+            id: sellerId,
+            username: data.username || 'Unknown',
+            profilePic: data.profilePic || ''
+          };
+
+          setSellerInfo(info);
+          setSellerName(info.username);
+        } else {
+          console.warn(" User doc not found for:", sellerId);
         }
+      } catch (error) {
+        console.error("Error fetching seller info:", error);
       }
     };
+
     fetchSellerInfo();
-  }, [item.userId]);
+  }, [sellerId]);
 
   const handleLike = async () => {
     if (!userId) return;
+
     const ref = doc(db, 'marketplace', item.id);
     const updatedLikes = likes.includes(userId)
       ? likes.filter(id => id !== userId)
       : [...likes, userId];
+
     setLikes(updatedLikes);
     await updateDoc(ref, { likes: updatedLikes });
   };
 
-  const screenWidth = Dimensions.get('window').width;
+  const startChatWithSeller = async () => {
+    if (!userId || !sellerInfo?.id) {
+      Alert.alert("Error", "Seller info is missing. Try again.");
+      return;
+    }
+
+    if (userId === sellerInfo.id) {
+      Alert.alert("Notice", "You can't message yourself.");
+      return;
+    }
+
+    const chatId = [userId, sellerInfo.id].sort().join('_');
+    const chatRef = doc(db, 'chats', chatId);
+    const chatDoc = await getDoc(chatRef);
+
+    if (!chatDoc.exists()) {
+      await setDoc(chatRef, {
+        participants: [userId, sellerInfo.id],
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    navigation.navigate('ChatRoom', {
+      chatId,
+      otherUser: sellerInfo,
+    });
+  };
 
   return (
     <ScrollView style={[styles.container, { paddingTop: 20 }]}>
-      {/* Back Button */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingHorizontal: 16, paddingBottom: 4 }}>
         <Ionicons name="arrow-back" size={26} color="#00796B" />
       </TouchableOpacity>
@@ -71,7 +125,9 @@ export default function ItemDetailScreen({ route, navigation }) {
               size={24}
               color={likes.includes(userId) ? 'red' : '#00796B'}
             />
-            <Text style={{ color: '#777', fontSize: 12 }}>{likes.length} like{likes.length === 1 ? '' : 's'}</Text>
+            <Text style={{ color: '#777', fontSize: 12 }}>
+              {likes.length} like{likes.length === 1 ? '' : 's'}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -86,6 +142,21 @@ export default function ItemDetailScreen({ route, navigation }) {
           </Text>
         )}
 
+        <View style={{ marginTop: 12 }}>
+          <Text style={{
+            backgroundColor: item.isSold ? '#b71c1c' : '#2e7d32',
+            color: 'white',
+            paddingVertical: 6,
+            paddingHorizontal: 12,
+            borderRadius: 8,
+            fontWeight: '600',
+            alignSelf: 'flex-start',
+            fontSize: 14,
+          }}>
+            {item.isSold ? 'Sold' : 'Available'}
+          </Text>
+        </View>
+
         {item.description && (
           <Text style={styles.description}>{item.description}</Text>
         )}
@@ -98,17 +169,17 @@ export default function ItemDetailScreen({ route, navigation }) {
           <Text style={styles.sellerId}>Username: {sellerName}</Text>
         </View>
 
-        {/* Buttons */}
-        <View style={{ marginTop: 24, flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+        <View style={{ marginTop: 24 }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('ChatScreen', { sellerId: item.userId })}
-            style={{ flex: 1, backgroundColor: '#A8E9DC', padding: 14, borderRadius: 8, alignItems: 'center' }}>
+            onPress={startChatWithSeller}
+            style={{
+              backgroundColor: '#A8E9DC',
+              padding: 14,
+              borderRadius: 8,
+              alignItems: 'center'
+            }}
+          >
             <Text style={{ color: '#1e1e1e', fontWeight: '600' }}>Message Seller</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ flex: 1, backgroundColor: '#00796B', padding: 14, borderRadius: 8, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontWeight: '600' }}>Buy / Offer</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -16,13 +16,13 @@ const translateMessage = async (message, targetLang = 'EN') => {
       }
     });
 
-    console.log("✅ Translation successful:", response.data);
+    console.log(" Translation successful:", response.data);
     const translatedText = response.data.translations[0].text;
     const detectedLanguage = response.data.translations[0].detected_source_language;
 
     return { translatedText, detectedLanguage };
   } catch (error) {
-    console.error('❌ Translation error:', error.response?.data || error.message);
+    console.error(' Translation error:', error.response?.data || error.message);
     return { translatedText: "Translation failed", detectedLanguage: null };
   }
 };

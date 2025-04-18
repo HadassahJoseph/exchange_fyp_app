@@ -6,6 +6,9 @@ import {
   FlatList,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import {
@@ -15,6 +18,8 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function FavouritesScreen() {
   const [activeTab, setActiveTab] = useState('places');
@@ -22,8 +27,10 @@ export default function FavouritesScreen() {
   const [items, setItems] = useState([]);
   const [posts, setPosts] = useState([]);
   const mapRef = useRef();
+  const navigation = useNavigation();
 
-  // Center map on selected place
+  const userId = auth.currentUser?.uid;
+
   const focusMapOnLocation = (location) => {
     if (mapRef.current && location) {
       mapRef.current.animateToRegion({
@@ -36,43 +43,32 @@ export default function FavouritesScreen() {
   };
 
   useEffect(() => {
-    if (activeTab === 'places') {
-      fetchFavourites();
-    } else if (activeTab === 'items') {
-      fetchItems();
-    } else if (activeTab === 'posts') {
-      fetchPosts();
-    }
+    if (!userId) return;
+    if (activeTab === 'places') fetchFavourites();
+    else if (activeTab === 'items') fetchItems();
+    else if (activeTab === 'posts') fetchPosts();
   }, [activeTab]);
 
   const fetchFavourites = async () => {
-    const userId = auth.currentUser?.uid;
     const q = query(collection(db, 'favourites'), where('createdBy', '==', userId));
     const snapshot = await getDocs(q);
     const favs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setFavourites(favs);
-
-    if (favs.length) {
-      focusMapOnLocation(favs[0].location);
-    }
+    if (favs.length) focusMapOnLocation(favs[0].location);
   };
 
   const fetchItems = async () => {
-    const userId = auth.currentUser?.uid;
     const q = query(collection(db, 'marketplace'), where('likedBy', 'array-contains', userId));
     const snapshot = await getDocs(q);
-    const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setItems(items);
+    setItems(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
   };
 
   const fetchPosts = async () => {
-    const userId = auth.currentUser?.uid;
     const q = query(collection(db, 'posts'), where('likes', 'array-contains', userId));
     const snapshot = await getDocs(q);
-    const posts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setPosts(posts);
+    setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
   };
-  
+
   const renderTabButton = (tab, label) => (
     <TouchableOpacity
       key={tab}
@@ -84,15 +80,21 @@ export default function FavouritesScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Tabs */}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#A8E9DC" />
+        </TouchableOpacity>
+        <Text style={styles.title}>My Favourites</Text>
+      </View>
+
       <View style={styles.tabs}>
         {renderTabButton('places', 'Places')}
         {renderTabButton('items', 'Items')}
         {renderTabButton('posts', 'Posts')}
       </View>
 
-      {/* Places Tab */}
+      {/* PLACES */}
       {activeTab === 'places' && (
         <>
           <MapView
@@ -120,7 +122,7 @@ export default function FavouritesScreen() {
                 onPress={() => focusMapOnLocation(item.location)}
               >
                 <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.info}>⭐ {item.rating} — {item.category}</Text>
+                <Text style={styles.info}> {item.rating} — {item.category}</Text>
                 <Text style={styles.note}>{item.note}</Text>
                 <Text style={styles.city}>{item.hostCity}</Text>
               </TouchableOpacity>
@@ -130,7 +132,7 @@ export default function FavouritesScreen() {
         </>
       )}
 
-      {/* Items Tab */}
+      {/* ITEMS */}
       {activeTab === 'items' && (
         <FlatList
           data={items}
@@ -147,7 +149,7 @@ export default function FavouritesScreen() {
         />
       )}
 
-      {/* Posts Tab */}
+      {/* POSTS */}
       {activeTab === 'posts' && (
         <FlatList
           data={posts}
@@ -162,16 +164,33 @@ export default function FavouritesScreen() {
           ListEmptyComponent={<Text style={styles.empty}>No posts liked.</Text>}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  title: {
+    fontSize: 20,
+    color: '#fff',
+    marginLeft: 10,
+    fontWeight: 'bold',
+  },
   tabs: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#eee',
+    backgroundColor: '#2b2b2b',
     paddingVertical: 10,
   },
   tabButton: {
@@ -180,27 +199,52 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   activeTab: {
-    backgroundColor: '#00796B',
+    backgroundColor: '#A8E9DC',
   },
   activeText: {
-    color: '#fff',
+    color: '#1e1e1e',
     fontWeight: 'bold',
   },
   inactiveText: {
-    color: '#333',
+    color: '#ccc',
   },
-  map: { height: 250 },
-  list: { padding: 10 },
+  map: {
+    height: 250,
+  },
+  list: {
+    padding: 14,
+    paddingBottom: 100,
+  },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2b2b2b',
     marginBottom: 10,
-    padding: 12,
-    borderRadius: 10,
-    elevation: 2,
+    padding: 14,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
-  name: { fontWeight: 'bold', fontSize: 16 },
-  info: { color: '#444', marginTop: 4 },
-  note: { color: '#666', marginTop: 4 },
-  city: { marginTop: 6, fontStyle: 'italic', color: '#888' },
-  empty: { textAlign: 'center', marginTop: 20, color: '#888' },
+  name: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  info: {
+    color: '#ccc',
+    marginTop: 4,
+  },
+  note: {
+    color: '#aaa',
+    marginTop: 4,
+  },
+  city: {
+    marginTop: 6,
+    fontStyle: 'italic',
+    color: '#888',
+  },
+  empty: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#777',
+  },
 });

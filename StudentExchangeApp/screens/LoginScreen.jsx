@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
-import styles from '../styles/authStyles'; // Using the same sleek style
+import styles from '../styles/authStyles'; 
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -37,14 +39,26 @@ export default function LoginScreen({ navigation }) {
         autoCapitalize="none"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#ccc"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      <View style={{ position: 'relative', width: '100%', marginBottom: 10 }}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#ccc"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={{ position: 'absolute', right: 15, top: '30%' }}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons
+            name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+            size={22}
+            color="#A8E9DC"
+          />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Log In</Text>

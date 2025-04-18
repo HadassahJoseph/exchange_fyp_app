@@ -48,7 +48,7 @@ exports.sendVerificationPin = onCall({
   try {
     const apiKey = SENDGRID_API_KEY.value();
     sgMail.setApiKey(apiKey);
-    console.log("✅ SendGrid API key set.");
+    console.log(" SendGrid API key set.");
 
     const msg = {
       to: email,
@@ -57,15 +57,15 @@ exports.sendVerificationPin = onCall({
       html: createHtmlEmail(username, pin),
     };
 
-    console.log("📤 About to send email with:", msg);
+    console.log(" About to send email with:", msg);
 
     await sgMail.send(msg);
 
-    console.log("✅ Email sent successfully.");
+    console.log("Email sent successfully.");
     return {success: true};
   } catch (error) {
     console.error(
-        "❌ SendGrid Error:",
+        " SendGrid Error:",
         (error.response && error.response.body) || error.message || error,
     );
     throw new HttpsError("internal", "Failed to send email");

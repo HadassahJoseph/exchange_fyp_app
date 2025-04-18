@@ -36,6 +36,11 @@ import DiscussionCard from './screens/DiscussionCard';
 import MapTab from './screens/MapTab';
 import ConnectionsTab from  './screens/ConnectionsTab';
 import AccommodationTab from './screens/AccommodationTab';
+import ConnectedTab from './screens/ConnectedTab';
+import OffersTab from './screens/OffersTab';
+import  ProfileViewScreen from './screens/ProfileViewScreen';
+import EditContentScreen from './screens/EditContentScreen';
+import DiscussionList from './screens/DiscussionList';
 
 
 const Stack = createNativeStackNavigator();
@@ -127,6 +132,12 @@ export default function App() {
         <Stack.Screen name="MapTab" component={MapTab}/>
         <Stack.Screen name="ConnectionsTab" component= {ConnectionsTab}/>
         <Stack.Screen name="AccommodationTab" component={AccommodationTab}/>
+        <Stack.Screen name='ConnectedTab' component={ConnectedTab}/>
+        <Stack.Screen name='OffersTab' component={OffersTab}/>
+        <Stack.Screen name='ProfileViewScreen' component={ProfileViewScreen}/>
+        <Stack.Screen name = 'EditContentScreen' component={EditContentScreen}/>     
+        <Stack.Screen name = 'DiscussionList' component={DiscussionList}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );

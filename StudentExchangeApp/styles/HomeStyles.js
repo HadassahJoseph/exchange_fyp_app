@@ -1,5 +1,8 @@
+
 // HomeStyles.js
 import { StyleSheet } from 'react-native';
+import { Dimensions } from 'react-native';
+const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
@@ -35,12 +38,16 @@ export default StyleSheet.create({
     borderRadius: 2,
     marginTop: 4,
   },
-
   list: {
     padding: 14,
+    paddingBottom: 80
   },
-
-  // Shared Card Styling
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginVertical: 14,
+  },
   card: {
     backgroundColor: '#2a2a2a',
     padding: 14,
@@ -60,8 +67,6 @@ export default StyleSheet.create({
     color: '#ffffff',
     marginBottom: 4,
   },
-
-  // Posts
   cardImage: {
     width: '100%',
     height: 180,
@@ -70,19 +75,16 @@ export default StyleSheet.create({
     resizeMode: 'cover',
     backgroundColor: '#333',
   },
-
   postHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-
   postUsername: {
     fontWeight: '600',
     color: '#fff',
     fontSize: 14,
   },
-
   postFooter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -96,8 +98,6 @@ export default StyleSheet.create({
     fontSize: 13,
     color: '#bbb',
   },
-
-  // Discussions
   discussionUsername: {
     color: '#A8E9DC',
     marginBottom: 6,
@@ -172,8 +172,6 @@ export default StyleSheet.create({
     fontWeight: '600',
     marginTop: 6,
   },
-
-  // Items (Grid)
   gridList: {
     paddingHorizontal: 12,
     paddingTop: 14,
@@ -210,12 +208,35 @@ export default StyleSheet.create({
     color: '#A8E9DC',
     fontWeight: 'bold',
   },
-
-  // Placeholder
   placeholderText: {
     fontSize: 15,
     color: '#777',
     textAlign: 'center',
     marginTop: 40,
   },
+
+  previewCard: {
+    backgroundColor: '#2a2a2a',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 2,
+  },
+
+  previewImage: {
+    width: width * 0.42,
+    height: 140,
+    borderRadius: 8,
+    marginBottom: 6,
+    resizeMode: 'cover',
+    backgroundColor: '#333',
+  },
+
+  
 });

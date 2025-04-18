@@ -72,7 +72,8 @@ export default function StudentVerificationScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Enter Verification Code</Text>
       <Text style={{ color: '#ccc', marginBottom: 15, textAlign: 'center' }}>
-        A 6-digit code was sent to your university email. Please enter it below to complete verification.
+        A 6-digit code was sent to your university email address.
+        {"\n\n"}Please check the inbox of the email you signed up with — and don't forget to check your spam or junk folder too.
       </Text>
 
       <TextInput

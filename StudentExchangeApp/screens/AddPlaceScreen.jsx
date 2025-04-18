@@ -115,11 +115,11 @@ export default function AddPlaceScreen() {
 
     try {
       await addDoc(collection(db, 'favourites'), data);
-      alert('✅ Place saved!');
+      alert('Place saved!');
       // reset inputs if you like
     } catch (error) {
-      console.error('🔥 Firebase save error:', error);
-      alert('❌ Failed to save place');
+      console.error(' Firebase save error:', error);
+      alert(' Failed to save place');
     }
   };
 

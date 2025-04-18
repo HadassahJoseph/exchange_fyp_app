@@ -21,12 +21,12 @@ export default function AccommodationTab() {
     try {
       const response = await fetch(url);
       const text = await response.text();  // 👈 read as plain text first
-      console.log('🔍 Raw response:', text);
+      console.log(' Raw response:', text);
   
       const data = JSON.parse(text);       // 👈 try parsing it after logging
       setHouses(data.houses || []);
     } catch (err) {
-      console.error('❌ Error fetching houses:', err);
+      console.error(' Error fetching houses:', err);
     }
   
     setLoading(false);

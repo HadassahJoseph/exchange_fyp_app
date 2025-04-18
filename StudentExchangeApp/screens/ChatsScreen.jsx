@@ -1,110 +1,167 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View, Text, ScrollView, TouchableOpacity, Image, StyleSheet
+} from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, setDoc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, doc, query, where, setDoc } from 'firebase/firestore';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { db } from '../firebase/firebaseConfig';
 
 export default function ChatsScreen({ navigation }) {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const [connections, setConnections] = useState([]);
+  const [connections, setConnections] = useState([]);
+  // const [offers, setOffers] = useState([]);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-    useEffect(() => {
-        const fetchConnections = async () => {
-            if (!user) {
-                console.log("❌ No user logged in.");
-                return;
-            }
+  const scrollRef = useRef();
+  // const [offersY, setOffersY] = useState(0); // y-position of offers section
 
-            console.log("🔍 Fetching connections for user:", user.uid);
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
+  useEffect(() => {
+    const fetchConnections = async () => {
+      if (!user) return;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const connectionIDs = userData.connections || [];
 
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                const userConnections = userData.connections || [];
-
-                console.log("✅ Connections found:", userConnections);
-
-                if (userConnections.length === 0) {
-                    console.log("⚠️ No connections available.");
-                    return;
-                }
-
-                // Fetch connected users' details
-                const usersCollection = collection(db, "users");
-                const q = query(usersCollection, where("__name__", "in", userConnections));
-                const querySnapshot = await getDocs(q);
-
-                const usersList = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                console.log("✅ Connected users' details fetched:", usersList);
-                setConnections(usersList);
-            } else {
-                console.log("❌ User document does not exist.");
-            }
-        };
-
-        fetchConnections();
-    }, [user]);
-
-    const openChat = async (otherUser) => {
-        if (!user) {
-            console.log("❌ No user logged in.");
-            return;
+        if (connectionIDs.length > 0) {
+          const q = query(collection(db, 'users'), where('__name__', 'in', connectionIDs));
+          const snapshot = await getDocs(q);
+          const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setConnections(results);
         }
-    
-        const chatId = [user.uid, otherUser.id].sort().join("_");
-        console.log(`📩 Attempting to open chat: ${chatId}`);
-    
-        try {
-            const chatRef = doc(db, "chats", chatId);
-            const chatDoc = await getDoc(chatRef);
-    
-            if (!chatDoc.exists()) {
-                console.log("💬 Chat does not exist, forcing creation...");
-                await setDoc(chatRef, {
-                    participants: [user.uid, otherUser.id],
-                    createdAt: new Date().toISOString()
-                });
-                console.log("✅ Chat created successfully!");
-            }
-    
-            console.log("📲 Navigating to ChatRoom...");
-            navigation.navigate("ChatRoom", { chatId, otherUser });
-        } catch (error) {
-            console.error("❌ Firestore Error:", error);
-        }
+      }
     };
-    
-    
-    
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Chats</Text>
-            <FlatList
-                data={connections}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.userContainer} onPress={() => openChat(item)}>
-                        <Image source={{ uri: item.profilePic || 'https://via.placeholder.com/100' }} style={styles.profileImage} />
-                        <Text style={styles.username}>{item.username}</Text>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={<Text style={styles.emptyText}>No connections available.</Text>}
-            />
+
+    fetchConnections();
+
+    // Replace this with your real logic
+    // setOffers([
+    //   { id: '1', username: 'Offer Tester', profilePic: 'https://via.placeholder.com/100' },
+    // ]);
+  }, [user]);
+
+  const openChat = async (otherUser) => {
+    const chatId = [user.uid, otherUser.id].sort().join('_');
+    const chatRef = doc(db, 'chats', chatId);
+    const chatDoc = await getDoc(chatRef);
+
+    if (!chatDoc.exists()) {
+      await setDoc(chatRef, {
+        participants: [user.uid, otherUser.id],
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    navigation.navigate('ChatRoom', { chatId, otherUser });
+  };
+
+  // const scrollToOffers = () => {
+  //   scrollRef.current?.scrollTo({ y: offersY, animated: true });
+  // };
+
+  const renderUserCard = (user, label = 'Connected') => (
+    <TouchableOpacity key={user.id} style={styles.chatCard} onPress={() => openChat(user)} activeOpacity={0.8}>
+      <Image source={{ uri: user.profilePic || 'https://via.placeholder.com/100' }} style={styles.avatar} />
+      <View>
+        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.subtext}>{label}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent} ref={scrollRef}>
+        {/* Connected Users */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Connected Users</Text>
+          {/* <TouchableOpacity onPress={scrollToOffers}>
+            <Text style={styles.jumpLink}>Jump to Offers ↓</Text>
+          </TouchableOpacity> */}
+          {connections.length === 0 ? (
+            <Text style={styles.emptyText}>No connections available.</Text>
+          ) : (
+            connections.map((user) => renderUserCard(user, 'Connected'))
+          )}
         </View>
-    );
+
+        {/* Offers */}
+        {/* <View
+          style={styles.sectionContainer}
+          onLayout={(event) => {
+            const { y } = event.nativeEvent.layout;
+            setOffersY(y);
+          }}
+        >
+          <Text style={styles.sectionTitle}>Offers</Text>
+          {offers.length === 0 ? (
+            <Text style={styles.emptyText}>No offers yet.</Text>
+          ) : (
+            offers.map((user) => renderUserCard(user, 'Offer'))
+          )}
+        </View> */}
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    userContainer: { flexDirection: 'row', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderBottomColor: '#ddd' },
-    profileImage: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-    username: { fontSize: 18, flex: 1 },
-    emptyText: { textAlign: 'center', marginTop: 20, fontSize: 16, color: 'gray' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+  },
+  scrollContent: {
+    paddingBottom: 100,
+  },
+  sectionContainer: {
+    marginTop: 20,
+    marginHorizontal: 16,
+  },
+  sectionTitle: {
+    color: '#A8E9DC',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
+  jumpLink: {
+    color: '#A8E9DC',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    marginBottom: 10,
+  },
+  chatCard: {
+    backgroundColor: '#2a2a2a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 16,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#A8E9DC',
+  },
+  username: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  subtext: {
+    color: '#aaa',
+    fontSize: 13,
+  },
+  emptyText: {
+    color: 'gray',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
 });

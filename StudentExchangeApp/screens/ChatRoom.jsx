@@ -1,7 +1,7 @@
-// ChatRoom.jsx (with dynamic DeepL language support)
+// ChatRoom.jsx 
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet
+  View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image
 } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import {
@@ -11,8 +11,10 @@ import { db } from '../firebase/firebaseConfig';
 import { serverTimestamp } from 'firebase/firestore';
 import translateMessage from '../utils/translateMessage';
 import { getDeepLCodeFromName } from '../utils/fetchSupportedLanguages';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function ChatRoom({ route }) {
+export default function ChatRoom({ route, navigation }) {
   const { chatId, otherUser } = route.params;
   const auth = getAuth();
   const user = auth.currentUser;
@@ -28,10 +30,10 @@ export default function ChatRoom({ route }) {
           const userData = userDoc.data();
           const languageCode = await getDeepLCodeFromName(userData.preferredLanguage || 'English');
           setRecipientLang(languageCode);
-          console.log(`🌎 Recipient prefers: ${languageCode}`);
+          console.log(` Recipient prefers: ${languageCode}`);
         }
       } catch (error) {
-        console.error("❌ Error fetching language:", error);
+        console.error(" Error fetching language:", error);
       }
     };
 
@@ -64,13 +66,19 @@ export default function ChatRoom({ route }) {
       });
       setNewMessage("");
     } catch (error) {
-      console.error("❌ Sending message failed:", error);
+      console.error(" Sending message failed:", error);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.chatTitle}>Chat with {otherUser.username}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#A8E9DC" />
+        </TouchableOpacity>
+        <Text style={styles.chatTitle}>{otherUser.username}</Text>
+      </View>
+
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id}
@@ -78,37 +86,99 @@ export default function ChatRoom({ route }) {
           <View
             style={[styles.messageBubble, item.senderId === user.uid ? styles.myMessage : styles.otherMessage]}
           >
-            <Text>{item.text}</Text>
+            <Text style={styles.messageText}>{item.text}</Text>
             {item.translatedText && item.translatedText !== item.text && (
               <Text style={styles.translatedText}>({item.translatedText})</Text>
             )}
           </View>
         )}
+        contentContainerStyle={{ padding: 10 }}
       />
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={newMessage}
           onChangeText={setNewMessage}
           placeholder="Type a message..."
+          placeholderTextColor="#aaa"
         />
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Text style={styles.sendText}>Send</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 10 },
-  chatTitle: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
-  messageBubble: { padding: 10, borderRadius: 10, marginBottom: 5, maxWidth: '80%' },
-  myMessage: { alignSelf: 'flex-end', backgroundColor: '#DCF8C6' },
-  otherMessage: { alignSelf: 'flex-start', backgroundColor: '#F0F0F0' },
-  translatedText: { fontSize: 12, color: 'gray', fontStyle: 'italic', marginTop: 3 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', padding: 10, borderTopWidth: 1, borderTopColor: '#ddd' },
-  input: { flex: 1, padding: 10, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, marginRight: 10 },
-  sendButton: { padding: 10, backgroundColor: '#4CAF50', borderRadius: 8 },
-  sendText: { color: '#fff', fontWeight: 'bold' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomColor: '#333',
+    borderBottomWidth: 1,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  chatTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#A8E9DC',
+  },
+  messageBubble: {
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    maxWidth: '80%',
+  },
+  myMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#2a2a2a',
+  },
+  otherMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#333',
+  },
+  messageText: {
+    color: 'white',
+  },
+  translatedText: {
+    fontSize: 12,
+    color: 'gray',
+    fontStyle: 'italic',
+    marginTop: 3,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    backgroundColor: '#1e1e1e',
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#444',
+    borderRadius: 8,
+    color: 'white',
+    marginRight: 10,
+  },
+  sendButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: '#A8E9DC',
+    borderRadius: 8,
+  },
+  sendText: {
+    color: '#1e1e1e',
+    fontWeight: 'bold',
+  },
 });

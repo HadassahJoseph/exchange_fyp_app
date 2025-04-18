@@ -3,10 +3,12 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase/firebaseConfig';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/AskQuestionStyles';
 
-
 export default function AskQuestionScreen() {
+  const navigation = useNavigation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(null);
@@ -46,7 +48,12 @@ export default function AskQuestionScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Ask a Question</Text>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#A8E9DC" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Ask a Question</Text>
+      </View>
 
       <TextInput
         style={styles.input}
